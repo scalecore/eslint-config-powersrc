@@ -6,13 +6,6 @@ const config: Linter.Config = {
     'plugin:vue/recommended',
     '../core/base/standard/vue'
   ],
-  parserOptions: {
-    parser: {
-      'js': 'espree',
-      'ts': '@typescript-eslint/parser',
-      '<template>': 'espree'
-    }
-  },
   rules: {
     // ## Vue ##
     // =========

@@ -14,7 +14,14 @@ const config: Linter.Config = {
     '../core/base/standard/typescript'
   ],
   parserOptions: {
-    extraFileExtensions: ['.vue']
+    // Support Vue.js components
+    extraFileExtensions: ['.vue'],
+    // Vue.js requires these options, which the import plug-in will pass to it
+    parser: {
+      'js': 'espree',
+      'ts': '@typescript-eslint/parser',
+      '<template>': 'espree'
+    }
   },
   settings: {
     'import/extensions': kAllExtensions,
@@ -25,7 +32,7 @@ const config: Linter.Config = {
     },
     'import/resolver': {
       node: { extensions: kAllExtensions },
-      typescript: { alwaysTryTypes: true }
+      typescript: { }
     }
   },
   rules: {
@@ -70,12 +77,19 @@ const config: Linter.Config = {
     // ## Overrides ##
     // ===============
     // ### Standard TS too strict
-    '@typescript-eslint/no-redeclare': 'off', // TypeScript handles this, and we do same types and variables.
+    // TypeScript handles this, and we use the same names on types and variables at times.
+    '@typescript-eslint/no-redeclare': 'off',
 
     // ### Conflicting rules ###
+    // TypeScript supports syntaxes and modules node normally would not.
     'n/no-unsupported-features/es-syntax': 'off',
     'n/no-missing-import': 'off',
-    'import/no-duplicates': 'off'
+    // Disable rules that aren't needed or just son't really work in TypeScript.
+    'import/no-named-as-default-member': 'off',
+    'import/no-duplicates': 'off',
+    'import/named': 'off',
+    'import/namespace': 'off',
+    'import/default': 'off'
   }
 }
 
