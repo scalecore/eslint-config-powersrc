@@ -1,7 +1,7 @@
 import type { PropagationConfiguration } from './propagate'
 
 export const kVueConfiguration: PropagationConfiguration = {
-  prefix: 'vue',
+  prefix: 'vue/',
   extended: [
     'array-bracket-newline',
     'array-bracket-spacing',
