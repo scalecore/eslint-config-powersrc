@@ -24,7 +24,8 @@ const config: Linter.Config = {
       'vue-eslint-parser': ['.vue']
     },
     'import/resolver': {
-      node: { extensions: kAllExtensions }
+      node: { extensions: kAllExtensions },
+      typescript: { alwaysTryTypes: true }
     }
   },
   rules: {

@@ -7,8 +7,11 @@ const config: Linter.Config = {
     '../core/base/standard/vue'
   ],
   parserOptions: {
-    parser: '@typescript-eslint/parser',
-    extraFileExtensions: ['.vue']
+    parser: {
+      'js': 'espree',
+      'ts': '@typescript-eslint/parser',
+      '<template>': 'espree'
+    }
   },
   rules: {
     // ## Vue ##
