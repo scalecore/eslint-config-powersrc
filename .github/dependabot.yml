@@ -12,3 +12,6 @@ updates:
     ignore:
       # Don't try to update types, those only need updating with their related package.
       - dependency-name: "@types/*"
+      # These packages have switched to ESModule, which we are not ready to use.
+      - dependency-name: "del"
+        update-types: ["version-update:semver-major"]
