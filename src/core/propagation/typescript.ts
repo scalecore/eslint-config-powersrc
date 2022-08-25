@@ -1,8 +1,19 @@
-import { isOff } from './propagate'
+import { z } from 'zod'
+import { isOff, mergeStringArray } from './propagate'
 import type { PropagationConfiguration } from './propagate'
 
+const kPrefix = '@typescript-eslint/'
+
+// Partial option schema, with catch all.
+const Indent = z.number().or(z.literal('tab')).default(4)
+const IndentOptions = z.object({
+  ignoredNodes: z.array(z.string()).nullable().default(null)
+}).catchall(z.unknown())
+  .default({})
+const NoUseBeforeDefineOptions = z.record(z.boolean()).default({})
+
 export const kTypeScriptConfiguration: PropagationConfiguration = {
-  prefix: '@typescript-eslint/',
+  prefix: kPrefix,
   extended: [
     'brace-style',
     'comma-dangle',
@@ -30,7 +41,6 @@ export const kTypeScriptConfiguration: PropagationConfiguration = {
     'no-throw-literal',
     'no-unused-expressions',
     'no-unused-vars',
-    'no-use-before-define',
     'no-useless-constructor',
     'object-curly-spacing',
     'padding-line-between-statements',
@@ -42,7 +52,47 @@ export const kTypeScriptConfiguration: PropagationConfiguration = {
     'space-infix-ops'
   ],
   conversions: {
-    'no-return-await': (_name, level, _entry) =>
-      (isOff(level) ? null : ['@typescript-eslint/return-await', [level, 'in-try-catch']])
+    'indent': function (name, level, entry) {
+      if (isOff(level)) {
+        return null
+      }
+
+      name = `${kPrefix}${name}`
+
+      const size = Indent.parse(entry?.[0])
+      const originals = IndentOptions.parse(entry?.[1])
+      const options = {
+        ...originals,
+        ignoredNodes: mergeStringArray(originals.ignoredNodes, [
+          'PropertyDefinition[decorators]',
+          'TSUnionType'
+        ])
+      }
+
+      return [name, [level, size, options]]
+    },
+    'no-use-before-define': function (name, level, entry) {
+      if (isOff(level)) {
+        return null
+      }
+
+      name = `${kPrefix}${name}`
+
+      const originals = NoUseBeforeDefineOptions.parse(entry?.[0])
+      const options = {
+        ...originals,
+        functions: false,
+        classes: false,
+        enums: false,
+        variables: false,
+        // Only the TypeScript rule has this option.
+        typedefs: false
+      }
+
+      return [name, [level, options]]
+    },
+    'no-return-await': function (name, level) {
+      return isOff(level) ? null : [`@typescript-eslint/${name}`, [level, 'in-try-catch']]
+    }
   }
 }
