@@ -17,8 +17,11 @@ const config: Linter.Config = {
     'vue/no-deprecated-scope-attribute': 'error',
     'vue/no-deprecated-slot-attribute': 'error',
     'vue/no-deprecated-slot-scope-attribute': 'error',
+    // vue/no-child-content will catch any violations
+    'vue/no-v-text-v-html-on-component': 'off',
     'vue/require-toggle-inside-transition': 'error',
-    'vue/valid-v-slot': ['error', { allowModifiers: true }], // Needed for Vuetify object path slot names.
+    // Needed for Vuetify object path slot names.
+    'vue/valid-v-slot': ['error', { allowModifiers: true }],
 
     // ### Strongly recommended ###
     // Prefer more compact style.
@@ -27,6 +30,7 @@ const config: Linter.Config = {
     // Prefer short-hand at all times.
     'vue/v-slot-style': ['error', { atComponent: 'shorthand', default: 'shorthand', named: 'shorthand' }],
     // These rules really make our mark-up hard to navigate.
+    'vue/first-attribute-linebreak': 'off',
     'vue/max-attributes-per-line': 'off',
     'vue/multiline-html-element-content-newline': 'off',
     'vue/singleline-html-element-content-newline': 'off',

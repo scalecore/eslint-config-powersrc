@@ -5,7 +5,10 @@ const config: Linter.Config = {
     'plugin:n/recommended',
     './javascript'
   ],
-  parserOptions: { ecmaVersion: 2020 },
+  parserOptions: {
+    ecmaVersion: 2020,
+    sourceType: 'script'
+  },
   plugins: ['n'],
   rules: {
     // ## Node ##

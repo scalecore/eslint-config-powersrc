@@ -3,7 +3,10 @@ import { kTypeScriptConfiguration } from '../core/propagation/typescript'
 import jsConfig from './javascript'
 import type { Linter } from 'eslint'
 
-const kAllExtensions = ['.ts', '.tsx', '.js', '.jsx', '.cjs', '.mjs']
+// For `import/extensions` and its settings
+const kAllExtensions = ['ts', 'tsx', 'js', 'jsx', 'cjs', 'mjs'] as const
+const kResolveExtensions = kAllExtensions.map(ext => `.${ext}` as const)
+const kNeverUseExtensions = Object.fromEntries(kAllExtensions.map(ext => [ext, 'never' as const]))
 
 const config: Linter.Config = {
   extends: [
@@ -24,14 +27,14 @@ const config: Linter.Config = {
     }
   },
   settings: {
-    'import/extensions': kAllExtensions,
+    'import/extensions': kResolveExtensions,
     'import/external-module-folders': ['node_modules', 'node_modules/@types'],
     'import/parsers': {
       '@typescript-eslint/parser': ['.ts', '.tsx'],
       'vue-eslint-parser': ['.vue']
     },
     'import/resolver': {
-      node: { extensions: kAllExtensions },
+      node: { extensions: kResolveExtensions },
       typescript: { }
     }
   },
@@ -72,7 +75,7 @@ const config: Linter.Config = {
     // ============
 
     // ### Style guide ###
-    'import/extensions': ['error', 'always', { ts: 'never', tsx: 'never' }],
+    'import/extensions': ['error', 'ignorePackages', kNeverUseExtensions],
 
     // ## Overrides ##
     // ===============

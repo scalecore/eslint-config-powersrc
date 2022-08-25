@@ -4,7 +4,10 @@ const config: Linter.Config = {
   extends: [
     './javascript'
   ],
-  parserOptions: { sourceType: 'module' },
+  parserOptions: {
+    ecmaVersion: 2020,
+    sourceType: 'module'
+  },
   rules: {
     // ## Import ##
     // ============

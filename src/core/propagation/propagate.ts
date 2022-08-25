@@ -1,7 +1,12 @@
 import type { Linter } from 'eslint'
 
-export type RuleConversion = (name: string, level: Linter.RuleLevel, entry: Linter.RuleEntry) =>
-null | [name: string, entry: Linter.RuleEntry]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Matching Linter
+export type RuleConversion<Options extends any[] = any[]> =
+  (name: string, level: Linter.RuleLevel, entry: null | Partial<Options>) =>
+  null | [name: string, entry: Linter.RuleEntry]
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Matching Linter
+type RuleConversionArgs<Options extends any[] = any[]> = Parameters<RuleConversion<Options>>
 
 export interface PropagationConfiguration {
   readonly prefix: string
@@ -59,6 +64,17 @@ export function findRules (by: RegExp, config: Linter.Config): Linter.RulesRecor
   return jsonClone(rules)
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Matching Linter
+export function parseRule<Options extends any[] = any[]> (name: string, entry: Linter.RuleEntry<Options>): RuleConversionArgs<Options> {
+  if (typeof entry === 'string' || typeof entry === 'number') {
+    return [name, entry, null]
+  }
+
+  const [level, ...options] = entry
+
+  return [name, level, options]
+}
+
 export function propagate (rules: Partial<Linter.RulesRecord>, config: PropagationConfiguration): Partial<Linter.RulesRecord> {
   const transformed: Partial<Linter.RulesRecord> = { }
 
@@ -76,8 +92,8 @@ export function propagate (rules: Partial<Linter.RulesRecord>, config: Propagati
       if (name in rules) {
         const entry = rules[name]
         if (entry != null) {
-          const level = Array.isArray(entry) ? entry[0] : entry
-          const converted = converter(name, level, entry)
+          const args = parseRule(name, entry)
+          const converted = converter(...args)
           if (converted != null) {
             transformed[name] = 'off'
             transformed[converted[0]] = jsonClone(converted[1])
@@ -88,4 +104,18 @@ export function propagate (rules: Partial<Linter.RulesRecord>, config: Propagati
   }
 
   return transformed
+}
+
+export function mergeStringArray (first: null | string[], second: null | string[]): string[] {
+  if (first == null) {
+    return second != null ? [...second] : []
+  }
+
+  if (second == null) {
+    return [...first]
+  }
+
+  const set = new Set([...first, ...second])
+
+  return Array.from(set.values())
 }
