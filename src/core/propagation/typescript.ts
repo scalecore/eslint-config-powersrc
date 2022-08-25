@@ -21,7 +21,6 @@ export const kTypeScriptConfiguration: PropagationConfiguration = {
     'default-param-last',
     'dot-notation',
     'func-call-spacing',
-    'indent',
     'init-declarations',
     'keyword-spacing',
     'lines-between-class-members',
@@ -57,8 +56,6 @@ export const kTypeScriptConfiguration: PropagationConfiguration = {
         return null
       }
 
-      name = `${kPrefix}${name}`
-
       const size = Indent.parse(entry?.[0])
       const originals = IndentOptions.parse(entry?.[1])
       const options = {
@@ -69,14 +66,15 @@ export const kTypeScriptConfiguration: PropagationConfiguration = {
         ])
       }
 
-      return [name, [level, size, options]]
+      return [`${kPrefix}${name}`, [level, size, options]]
+    },
+    'no-return-await': function (name, level) {
+      return isOff(level) ? null : [`${kPrefix}${name}`, [level, 'in-try-catch']]
     },
     'no-use-before-define': function (name, level, entry) {
       if (isOff(level)) {
         return null
       }
-
-      name = `${kPrefix}${name}`
 
       const originals = NoUseBeforeDefineOptions.parse(entry?.[0])
       const options = {
@@ -89,10 +87,7 @@ export const kTypeScriptConfiguration: PropagationConfiguration = {
         typedefs: false
       }
 
-      return [name, [level, options]]
-    },
-    'no-return-await': function (name, level) {
-      return isOff(level) ? null : [`@typescript-eslint/${name}`, [level, 'in-try-catch']]
+      return [`${kPrefix}${name}`, [level, options]]
     }
   }
 }
