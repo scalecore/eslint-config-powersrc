@@ -1,18 +1,41 @@
+import { z } from 'zod'
 import type { Linter } from 'eslint'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Matching Linter
-export type RuleConversion<Options extends any[] = any[]> =
-  (name: string, level: Linter.RuleLevel, entry: null | Partial<Options>) =>
-  null | [name: string, entry: Linter.RuleEntry]
+export type Severity = z.infer<typeof Severity>
+export const Severity = z.literal(0).or(z.literal(1)).or(z.literal(2))
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Matching Linter
-type RuleConversionArgs<Options extends any[] = any[]> = Parameters<RuleConversion<Options>>
+export type RuleLevel = z.infer<typeof RuleLevel>
+export const RuleLevel = Severity.or(z.enum(['off', 'warn', 'error']))
 
-export interface PropagationConfiguration {
-  readonly prefix: string
-  readonly extended?: readonly string[]
-  readonly conversions?: Record<string, RuleConversion>
-}
+export type RuleOptions = z.infer<typeof RuleOptions>
+export const RuleOptions = z.array(z.any())
+
+export type RuleConfig = z.infer<typeof RuleConfig>
+export const RuleConfig = RuleLevel.or(z.tuple([RuleLevel]).rest(z.any()))
+
+type RulesRecord = z.infer<typeof RulesRecord>
+const RulesRecord = z.record(RuleConfig.optional())
+
+export type RuleEntry = z.infer<typeof RuleEntry>
+export const RuleEntry = z.tuple([z.string().min(1), RuleConfig])
+
+type ParsedRule = z.infer<typeof ParsedRule>
+const ParsedRule = z.tuple([z.string().min(1), RuleLevel, RuleOptions.nullable()])
+
+export type RuleConversion = z.infer<typeof RuleConversion>
+export const RuleConversion = z.function(ParsedRule, RuleEntry.nullable())
+
+export type PropagationConfiguration = z.infer<typeof PropagationConfiguration>
+export const PropagationConfiguration = z.object({
+  prefix: z.string().min(1).endsWith('/'),
+  extended: z.array(z.string().min(1)),
+  excluded: z.array(z.string().min(1)),
+  conversions: z.record(RuleConversion)
+}).partial({
+  extended: true,
+  excluded: true,
+  conversions: true
+})
 
 export const isOff = (value: unknown): value is 'off' | 0 => value === 'off' || value === 0
 export const isWarn = (value: unknown): value is 'warn' | 1 => value === 'warn' || value === 1
@@ -44,7 +67,7 @@ function overrides (by: RegExp, override: Linter.ConfigOverride): boolean {
   return true
 }
 
-export function findRules (by: RegExp, config: Linter.Config): Linter.RulesRecord {
+export function findRules (by: RegExp, config: Linter.Config): RulesRecord {
   let rules = { }
 
   // Grab the root rules first
@@ -64,47 +87,54 @@ export function findRules (by: RegExp, config: Linter.Config): Linter.RulesRecor
   return jsonClone(rules)
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Matching Linter
-export function parseRule<Options extends any[] = any[]> (name: string, entry: Linter.RuleEntry<Options>): RuleConversionArgs<Options> {
-  if (typeof entry === 'string' || typeof entry === 'number') {
-    return [name, entry, null]
+export function parseRule (name: string, config: RuleConfig): ParsedRule {
+  if (typeof config === 'string' || typeof config === 'number') {
+    return [name, config, null]
   }
 
-  const [level, ...options] = entry
+  const [level, ...options] = config
 
   return [name, level, options]
 }
 
-export function propagate (rules: Partial<Linter.RulesRecord>, config: PropagationConfiguration): Partial<Linter.RulesRecord> {
-  const transformed: Partial<Linter.RulesRecord> = { }
+const Propagate = z.function(z.tuple([RulesRecord, PropagationConfiguration]), RulesRecord)
+export const propagate = Propagate.implement((rules, config) => {
+  const transformed: RulesRecord = { }
 
   if (config.extended != null) {
     for (const extended of config.extended) {
-      if (extended in rules) {
+      const entry = rules[extended]
+      if (entry != null) {
         transformed[extended] = 'off'
-        transformed[`${config.prefix}${extended}`] = jsonClone(rules[extended])
+        transformed[`${config.prefix}${extended}`] = jsonClone(entry)
+      }
+    }
+  }
+
+  if (config.excluded != null) {
+    for (const excluded of config.excluded) {
+      if (excluded in rules) {
+        transformed[excluded] = 'off'
       }
     }
   }
 
   if (config.conversions != null) {
     for (const [name, converter] of Object.entries(config.conversions)) {
-      if (name in rules) {
-        const entry = rules[name]
-        if (entry != null) {
-          const args = parseRule(name, entry)
-          const converted = converter(...args)
-          if (converted != null) {
-            transformed[name] = 'off'
-            transformed[converted[0]] = jsonClone(converted[1])
-          }
+      const entry = rules[name]
+      if (entry != null) {
+        const args = parseRule(name, entry)
+        const converted = converter(...args)
+        if (converted != null) {
+          transformed[name] = 'off'
+          transformed[converted[0]] = jsonClone(converted[1])
         }
       }
     }
   }
 
   return transformed
-}
+})
 
 export function mergeStringArray (first: null | string[], second: null | string[]): string[] {
   if (first == null) {

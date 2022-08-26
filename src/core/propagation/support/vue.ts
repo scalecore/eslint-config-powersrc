@@ -1,4 +1,4 @@
-import type { PropagationConfiguration } from './propagate'
+import type { PropagationConfiguration } from '../propagate'
 
 export const kVueConfiguration: PropagationConfiguration = {
   prefix: 'vue/',
