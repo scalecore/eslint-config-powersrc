@@ -1,5 +1,5 @@
 import { propagate } from '../core/propagation/propagate'
-import { kTypeScriptConfiguration } from '../core/propagation/typescript'
+import { kTypeScriptConfiguration } from '../core/propagation/support/typescript'
 import jsConfig from './javascript'
 import type { Linter } from 'eslint'
 

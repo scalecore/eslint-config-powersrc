@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { isOff, mergeStringArray } from './propagate'
-import type { PropagationConfiguration } from './propagate'
+import { isOff, mergeStringArray } from '../propagate'
+import type { PropagationConfiguration } from '../propagate'
 
 const kPrefix = '@typescript-eslint/'
 
@@ -67,6 +67,13 @@ export const kTypeScriptConfiguration: PropagationConfiguration = {
       }
 
       return [`${kPrefix}${name}`, [level, size, options]]
+    },
+    'no-duplicate-imports': function (_name, level) {
+      if (isOff(level)) {
+        return null
+      }
+
+      return ['import/no-duplicates', level]
     },
     'no-return-await': function (name, level) {
       return isOff(level) ? null : [`${kPrefix}${name}`, [level, 'in-try-catch']]

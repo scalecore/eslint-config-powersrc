@@ -1,6 +1,6 @@
 import standardTypeScriptConfig from 'eslint-config-standard-with-typescript'
 import { configExtends, configPlugins, findRules, propagate } from '../../propagation/propagate'
-import { kTypeScriptConfiguration } from '../../propagation/typescript'
+import { kTypeScriptConfiguration } from '../../propagation/support/typescript'
 import standardConfig from './javascript'
 import type { Linter } from 'eslint'
 
