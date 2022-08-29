@@ -97,7 +97,10 @@ export function parseRule (name: string, config: RuleConfig): ParsedRule {
   return [name, level, options]
 }
 
-const Propagate = z.function(z.tuple([RulesRecord, PropagationConfiguration]), RulesRecord)
+// Switch to the original after a fix for https://github.com/colinhacks/zod/issues/1362 is released
+const Propagate =
+  // z.function(z.tuple([RulesRecord, PropagationConfiguration]), RulesRecord)
+  z.function().args(RulesRecord, PropagationConfiguration).returns(RulesRecord)
 export const propagate = Propagate.implement((rules, config) => {
   const transformed: RulesRecord = { }
 
