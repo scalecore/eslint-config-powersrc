@@ -76,7 +76,7 @@ export const kTypeScriptConfiguration: PropagationConfiguration = {
       return ['import/no-duplicates', level]
     },
     'no-return-await': function (name, level) {
-      return isOff(level) ? null : [`${kPrefix}${name}`, [level, 'in-try-catch']]
+      return isOff(level) ? null : [`${kPrefix}return-await`, [level, 'in-try-catch']]
     },
     'no-use-before-define': function (name, level, entry) {
       if (isOff(level)) {
