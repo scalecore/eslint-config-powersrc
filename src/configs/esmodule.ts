@@ -5,7 +5,7 @@ const config: Linter.Config = {
     './javascript'
   ],
   parserOptions: {
-    ecmaVersion: 2020,
+    ecmaVersion: 2021,
     sourceType: 'module'
   },
   rules: {
@@ -13,8 +13,7 @@ const config: Linter.Config = {
     // ============
 
     // ### Module systems ###
-    'import/no-commonjs': 'error',
-    'import/no-nodejs-modules': 'error'
+    'import/no-commonjs': 'error'
   }
 }
 
