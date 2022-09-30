@@ -7,7 +7,7 @@ const config: Linter.Config = {
     'plugin:promise/recommended',
     '../core/base/standard/javascript'
   ],
-  parserOptions: { ecmaVersion: 2020 },
+  parserOptions: { ecmaVersion: 2021 },
   rules: {
     // ## ESLint rules ##
     // ==================
