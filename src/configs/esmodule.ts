@@ -5,7 +5,7 @@ const config: Linter.Config = {
     './javascript'
   ],
   parserOptions: {
-    ecmaVersion: 2020,
+    ecmaVersion: 2021,
     sourceType: 'module'
   },
   rules: {
