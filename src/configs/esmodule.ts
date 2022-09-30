@@ -13,8 +13,7 @@ const config: Linter.Config = {
     // ============
 
     // ### Module systems ###
-    'import/no-commonjs': 'error',
-    'import/no-nodejs-modules': 'error'
+    'import/no-commonjs': 'error'
   }
 }
 
