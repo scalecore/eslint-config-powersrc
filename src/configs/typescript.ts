@@ -77,9 +77,6 @@ const config: Linter.Config = {
     // ### Style guide ###
     'import/extensions': ['error', 'ignorePackages', kNeverUseExtensions],
 
-    // ### Module systems ###
-    'import/no-nodejs-modules': 'error',
-
     // ## Overrides ##
     // ===============
     // ### Standard TS too strict

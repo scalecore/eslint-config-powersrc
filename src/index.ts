@@ -8,12 +8,12 @@ const config: Linter.Config = {
   overrides: [
     // CommonJS
     {
-      files: ['*.cjs'],
+      files: ['*.js', '*.cjs'],
       extends: ['./configs/commonjs']
     },
     // ECMAScript Modules
     {
-      files: ['*.js', '*.mjs', '*.jsx'],
+      files: ['*.mjs', '*.jsx'],
       extends: ['./configs/esmodule']
     },
     // TypeScript
