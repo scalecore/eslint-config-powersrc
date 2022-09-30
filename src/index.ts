@@ -3,17 +3,17 @@ import type { Linter } from 'eslint'
 const config: Linter.Config = {
   reportUnusedDisableDirectives: true,
   parserOptions: {
-    ecmaVersion: 2020
+    ecmaVersion: 2021
   },
   overrides: [
     // CommonJS
     {
-      files: ['*.js', '*.cjs'],
+      files: ['*.cjs'],
       extends: ['./configs/commonjs']
     },
     // ECMAScript Modules
     {
-      files: ['*.mjs', '*.jsx'],
+      files: ['*.js', '*.mjs', '*.jsx'],
       extends: ['./configs/esmodule']
     },
     // TypeScript
